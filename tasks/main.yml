@@ -1,0 +1,66 @@
+---
+- name: Ensure libuser is installed
+  ansible.builtin.package:
+    name: libuser
+
+- name: Ensure groups exists
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ local_groups }}"
+
+- name: Ensure users exists
+  ansible.builtin.user:
+    name: "{{ item.0.name }}"
+    expires: "{{ item.0.expires | default(omit) }}"
+    groups: "{{ item.1 }}"
+    home: "{{ item.0.home | default(omit) }}"
+    local: true
+    password: "{{ item.0.password_hash | default(omit) }}"
+    password_expire_max: "{{ item.0.password_expire_max | default(omit) }}"
+    shell: "{{ item.0.shell | default('/bin/bash') }}"
+    state: present
+  loop: "{{ local_users | subelements('groups') }}"
+  no_log: true
+
+- name: Add authorized_key for users
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ item.key }}"
+    state: present
+  loop: "{{ local_authorized_keys }}"
+
+- name: Ensure sudoers users
+  ansible.builtin.copy:
+    content: '{{ item }} ALL=(ALL:ALL) ALL'
+    dest: "/etc/sudoers.d/{{ item }}"
+    mode: '0440'
+    validate: '/usr/sbin/visudo -csf %s'
+  loop: "{{ local_sudoers }}"
+
+- name: Ensure sudoers groups
+  ansible.builtin.copy:
+    # in the sudo file we need to escape a space in the group name with a backslash
+    content: "%{{ item | replace(' ', (local_sudoers_groups_backslash + ' ')) }} ALL=(ALL:ALL) ALL"
+    dest: "/etc/sudoers.d/{{ item | replace(' ','_') }}"
+    mode: '0440'
+    validate: '/usr/sbin/visudo -csf %s'
+  loop: "{{ local_sudoers_groups }}"
+
+- name: Ensure sudoers users nopass
+  ansible.builtin.copy:
+    content: '{{ item }} ALL=(ALL) NOPASSWD:ALL'
+    dest: "/etc/sudoers.d/{{ item }}"
+    mode: '0440'
+    validate: '/usr/sbin/visudo -csf %s'
+  loop: "{{ local_sudoers_nopass }}"
+
+- name: Ensure sudoers groups nopass
+  ansible.builtin.copy:
+    # in the sudo file we need to escape a space in the group name with a backslash
+    content: "%{{ item | replace(' ', (local_sudoers_groups_backslash + ' ')) }} ALL=(ALL) NOPASSWD:ALL"
+    dest: "/etc/sudoers.d/{{ item | replace(' ','_') }}"
+    mode: '0440'
+    validate: '/usr/sbin/visudo -csf %s'
+  loop: "{{ local_sudoers_groups_nopass }}"
+...

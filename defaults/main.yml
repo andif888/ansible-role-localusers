@@ -1,0 +1,56 @@
+---
+# @var local_groups:description: Groups to be present
+# @var local_groups:example: >
+# local_groups: ["sudo", "adm"]
+# @end
+local_groups: []
+
+
+# @var local_users:description: Users to be present
+# @var local_users:example: >
+# local_users:
+#   - name: local_admin
+#     expires: -1
+#     groups: ["sudo", "adm"]
+#     password_hash: "somehash"
+#     password_expire_max: -1
+#     shell: "/bin/bash"
+#   - name: second_user
+#     groups: ["sudo"]
+# @end
+local_users: []
+
+# @var local_authorized_keys:description: Authorized Keys to be present
+# @var local_authorized_keys:example: >
+# local_authorized_keys:
+#   - name: local_admin
+#     key: "somekey"
+#   - name: second_user
+#     key: "otherkey"
+# @end
+local_authorized_keys: []
+
+# @var local_sudoers:description: Sudoers to be present
+# @var local_sudoers:example: >
+# local_sudoers: ["localadmin", "second_user"]
+# @end
+local_sudoers: []
+
+# @var local_sudoers_groups:description: Sudoers to be present
+# @var local_sudoers_groups:example: >
+# local_sudoers_groups: ["domain-admins", "other-group"]
+# @end
+local_sudoers_groups: []
+
+# @var local_sudoers_nopass:description: Sudoers to be present
+# @var local_sudoers_nopass:example: >
+# local_sudoers_nopass: ["localadmin", "second_user"]
+# @end
+local_sudoers_nopass: []
+
+# @var local_sudoers_groups_nopass:description: Sudoers to be present
+# @var local_sudoers_groups_nopass:example: >
+# local_sudoers_groups_nopass: ["domain-admins", "other-group"]
+# @end
+local_sudoers_groups_nopass: []
+...
